@@ -44,6 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Authentication state
   let currentUser = null;
 
+  // Helper function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // Time range mappings for the dropdown
   const timeRanges = {
     morning: { start: "06:00", end: "08:00" }, // Before school hours
@@ -557,17 +564,18 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     // Create social sharing buttons
+    const escapedName = escapeHtml(name);
     const shareButtons = `
       <div class="share-buttons">
-        <button class="share-btn share-twitter tooltip" data-activity="${name}" title="Share on Twitter">
+        <button class="share-btn share-twitter tooltip" data-activity="${escapedName}" aria-label="Share on Twitter">
           <span class="share-icon">🐦</span>
           <span class="tooltip-text">Share on Twitter</span>
         </button>
-        <button class="share-btn share-facebook tooltip" data-activity="${name}" title="Share on Facebook">
+        <button class="share-btn share-facebook tooltip" data-activity="${escapedName}" aria-label="Share on Facebook">
           <span class="share-icon">📘</span>
           <span class="tooltip-text">Share on Facebook</span>
         </button>
-        <button class="share-btn share-email tooltip" data-activity="${name}" title="Share via Email">
+        <button class="share-btn share-email tooltip" data-activity="${escapedName}" aria-label="Share via Email">
           <span class="share-icon">✉️</span>
           <span class="tooltip-text">Share via Email</span>
         </button>
@@ -648,9 +656,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareFacebookBtn = activityCard.querySelector(".share-facebook");
     const shareEmailBtn = activityCard.querySelector(".share-email");
 
-    shareTwitterBtn.addEventListener("click", () => shareOnTwitter(name, details));
-    shareFacebookBtn.addEventListener("click", () => shareOnFacebook(name, details));
-    shareEmailBtn.addEventListener("click", () => shareViaEmail(name, details));
+    if (shareTwitterBtn) {
+      shareTwitterBtn.addEventListener("click", () => shareOnTwitter(name, details));
+    }
+    if (shareFacebookBtn) {
+      shareFacebookBtn.addEventListener("click", () => shareOnFacebook(name, details));
+    }
+    if (shareEmailBtn) {
+      shareEmailBtn.addEventListener("click", () => shareViaEmail(name, details));
+    }
 
     activitiesList.appendChild(activityCard);
   }
