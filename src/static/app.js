@@ -25,6 +25,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // Dark mode elements
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+  const darkModeIcon = document.getElementById("dark-mode-icon");
+
+  // Dark mode functionality
+  function initializeDarkMode() {
+    // Check for saved dark mode preference
+    try {
+      const savedDarkMode = localStorage.getItem("darkMode");
+      if (savedDarkMode === "enabled") {
+        document.body.classList.add("dark-mode");
+        if (darkModeIcon) {
+          darkModeIcon.textContent = "☀️";
+        }
+        if (darkModeToggle) {
+          darkModeToggle.setAttribute("aria-pressed", "true");
+        }
+      } else {
+        if (darkModeToggle) {
+          darkModeToggle.setAttribute("aria-pressed", "false");
+        }
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage for dark mode:", error);
+    }
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    
+    // Update icon and save preference
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    
+    if (darkModeIcon) {
+      darkModeIcon.textContent = isDarkMode ? "☀️" : "🌙";
+    }
+    
+    if (darkModeToggle) {
+      darkModeToggle.setAttribute("aria-pressed", isDarkMode ? "true" : "false");
+    }
+    
+    try {
+      localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+    } catch (error) {
+      console.error("Error saving dark mode preference:", error);
+    }
+  }
+
+  // Add event listener for dark mode toggle
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener("click", toggleDarkMode);
+  }
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -941,6 +994,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
+  initializeDarkMode();
   checkAuthentication();
   initializeFilters();
   fetchActivities();
